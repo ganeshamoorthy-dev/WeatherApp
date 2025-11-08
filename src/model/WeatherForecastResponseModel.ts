@@ -39,7 +39,7 @@ export interface Current {
   uv: number;
   gust_mph: number;
   gust_kph: number;
-  air_quality: AirQualityDataModel;
+  air_quality?: AirQualityDataModel;
   time_epoch: number;
   time: string;
   snow_cm?: number;

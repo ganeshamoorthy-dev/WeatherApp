@@ -10,31 +10,85 @@ import PressureImg from "../../assets/Group 62.svg";
 import FeelsLikeImg from "../../assets/Icon awesome-temperature-high.svg";
 import VisibilityImg from "../../assets/Icon material-visibility.svg";
 import WeatherAttribute from "../WeatherAttribute/WeatherAttribute";
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
+import { TimeUtil } from "../../utils/TimeUtil";
 
 const StyledWeatherDetailsContent = styled.div`
-  display: flex;
-  gap: 32px;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
 
   @media (max-width: 576px) {
-    gap: 1rem;
-    justify-content: center;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
   }
 `;
 
 const StyledWeatherDetailsContainer = styled.div`
-  padding: 16px;
-  margin-top: 32px;
-  background-color: #e9ebf6;
-  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.7s ease-out;
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
+    border-radius: 16px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 576px) {
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 16px;
+  }
 
   & .header {
-    margin-left: 16px;
-    color: #898989;
-    font-weight: bold;
+    color: #667eea;
+    font-weight: 700;
+    margin-bottom: 4px;
+    padding-left: 4px;
+    font-size: 1.3rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 576px) {
+      font-size: 1.1rem;
+    }
   }
 `;
 
@@ -48,6 +102,16 @@ function createWeatherAttributeConfig(title: string, value: string, imgSrc: stri
 
 function WeatherInsights(props: WeatherInsightsModel) {
   const { insights, astro } = props;
+
+  // Extract date and time from insights
+  const timeString = insights.last_updated || insights.time;
+  const selectedDate = timeString
+    ? TimeUtil.getDateString(new Date(timeString).getTime() / 1000)
+    : undefined;
+  const selectedTime = timeString
+    ? TimeUtil.convertTo12Hour(timeString.split(" ")[1])
+    : undefined;
+
   function getWeatherAttributeConfigList(): WeatherAttributeModel[] {
     const windSpeedConfig = createWeatherAttributeConfig("WIND", `${insights.wind_mph} Mph`, windImg);
     const sunRiseConfig = createWeatherAttributeConfig("SUNRISE", astro.sunrise, SunRiseImg);
@@ -72,9 +136,41 @@ function WeatherInsights(props: WeatherInsightsModel) {
 
   return (
     <StyledWeatherDetailsContainer>
-      <Typography variant="h6" className="header">
-        Weather Insights
-      </Typography>
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 2,
+        marginBottom: 1
+      }}>
+        <Typography variant="h6" className="header">
+          Weather Insights
+        </Typography>
+        {selectedDate && selectedTime && (
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            '@media (max-width: 576px)': {
+              padding: '6px 12px',
+            }
+          }}>
+            <Typography variant="body2" sx={{
+              color: '#667eea',
+              fontWeight: 600,
+              '@media (max-width: 576px)': {
+                fontSize: '0.8rem',
+              }
+            }}>
+              📅 {selectedDate} • 🕒 {selectedTime}
+            </Typography>
+          </Box>
+        )}
+      </Box>
       <StyledWeatherDetailsContent>
         {getWeatherAttributeConfigList().map((config) => (
           <WeatherAttribute key={config.title} {...config} />

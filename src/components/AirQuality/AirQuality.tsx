@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { AirQualityModel } from "./AirQualityModel";
-import { Tooltip, Typography } from "@mui/material";
+import { Tooltip, Typography, Box } from "@mui/material";
 import StyledBarChart from "../BarChart/BarChart";
 import { BarChartPropModel } from "../BarChart/BarChartModel";
 import StyledGaugeChart from "../GaugeChart/GaugeChart";
@@ -28,68 +28,154 @@ AirQualityIndexMapperForGbIndex[9] = { text: "High", color: "Orange" };
 AirQualityIndexMapperForGbIndex[10] = { text: "Very High", color: "Red" };
 
 const StyledAirQualityContainer = styled.div`
-  padding: 16px;
-  background-color: #e9ebf6;
-  margin-top: 32px;
-  border-radius: 12px;
+  padding: 24px;
+  background: white;
+  margin-top: 24px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.8s ease-out;
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
+    border-radius: 16px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 576px) {
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 16px;
+  }
 
   & .title {
-    color: #898989;
-    margin-left: 16px;
-    font-weight: bold;
+    color: #667eea;
+    font-weight: 700;
+    margin-bottom: 4px;
+    padding-left: 4px;
+    font-size: 1.3rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 576px) {
+      font-size: 1.1rem;
+    }
   }
 
   & .content {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 16px;
-    gap: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+
+    @media (max-width: 1024px) {
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
 
     @media (max-width: 576px) {
-      justify-content: center;
+      gap: 12px;
     }
   }
+
   & .air-pollutant-level-chart {
-    min-width: 260px;
     position: relative;
-    padding: 8px 16px;
-    border-radius: 12px;
+    padding: 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    @media (max-width: 768px) {
+      padding: 16px;
+      border-radius: 12px;
+    }
 
     & .chart-title {
       position: absolute;
-      top: 24px;
-      left: 30%;
-      font-weight: bold;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 700;
+      color: #667eea;
+      font-size: 1rem;
+      text-align: center;
+
+      @media (max-width: 576px) {
+        font-size: 0.9rem;
+        top: 16px;
+      }
     }
-    background-color: #fff;
   }
 
   & .air-quality-chart {
-    min-width: 260px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 16px;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
 
-    @media (max-width: 576px) {
-      min-width: 300px;
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    @media (max-width: 768px) {
+      padding: 16px;
+      border-radius: 12px;
     }
 
     & .chart-title {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 8px;
       text-align: center;
-      font-weight: bold;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 8px;
+      font-size: 1rem;
+
+      @media (max-width: 576px) {
+        font-size: 0.9rem;
+        gap: 6px;
+      }
     }
   }
 `;
 
 function AirQuality(props: AirQualityModel) {
-  const { data } = props;
+  const { data, selectedTime, selectedDate } = props;
 
   function prepareBarChartConfig(): BarChartPropModel {
     const barChartConfig: BarChartPropModel = {
@@ -129,9 +215,41 @@ function AirQuality(props: AirQualityModel) {
 
   return (
     <StyledAirQualityContainer>
-      <Typography variant="h6" className="title">
-        Air Quality
-      </Typography>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 2,
+        marginBottom: 1
+      }}>
+        <Typography variant="h6" className="title">
+          Air Quality
+        </Typography>
+        {selectedDate && selectedTime && (
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            '@media (max-width: 576px)': {
+              padding: '6px 12px',
+            }
+          }}>
+            <Typography variant="body2" sx={{ 
+              color: '#667eea', 
+              fontWeight: 600,
+              '@media (max-width: 576px)': {
+                fontSize: '0.8rem',
+              }
+            }}>
+              📅 {selectedDate} • 🕒 {selectedTime}
+            </Typography>
+          </Box>
+        )}
+      </Box>
 
       <div className="content">
         <div className="air-pollutant-level-chart">

@@ -6,4 +6,5 @@ export interface CurrentWeatherModel {
   condition: string;
   imgSrc: string;
   isDay: boolean;
+  onClick?: () => void;
 }
