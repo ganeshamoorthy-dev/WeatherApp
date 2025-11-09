@@ -420,7 +420,39 @@ function WeatherAppBase() {
               ))}
 
               <Box>
-                <WeatherInsights insights={currentWeatherInsights.insights} astro={currentWeatherInsights.astro} />
+                {currentWeatherInsights.insights && currentWeatherInsights.astro ? (
+                  <WeatherInsights insights={currentWeatherInsights.insights} astro={currentWeatherInsights.astro} />
+                ) : (
+                  <Box sx={{
+                    padding: '24px',
+                    background: 'white',
+                    marginTop: '24px',
+                    borderRadius: '20px',
+                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                    textAlign: 'center',
+                    '@media (max-width: 768px)': {
+                      padding: '20px',
+                      borderRadius: '16px',
+                      marginTop: '20px',
+                    },
+                    '@media (max-width: 576px)': {
+                      padding: '16px',
+                      borderRadius: '12px',
+                      marginTop: '16px',
+                    }
+                  }}>
+                    <Typography variant="h6" sx={{ 
+                      color: '#667eea', 
+                      fontWeight: 700,
+                      marginBottom: 1
+                    }}>
+                      Weather Insights Not Available
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#64748b' }}>
+                      Weather insights information is not available for this time period. Please try selecting a different time.
+                    </Typography>
+                  </Box>
+                )}
               </Box>
 
               <Box>
